@@ -6,7 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.LocalDateTime;
 
@@ -16,15 +19,24 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class AdminAccessLoggingAspect {
 
-    private final HttpServletRequest request;
+//    private final HttpServletRequest request;
 
-    @After("execution(* org.example.expert.domain.user.controller.UserController.getUser(..))")
+    @Before("execution(* org.example.expert.domain.user.controller.UserAdminController.changeUserRole(..))")
     public void logAfterChangeUserRole(JoinPoint joinPoint) {
-        String userId = String.valueOf(request.getAttribute("userId"));
-        String requestUrl = request.getRequestURI();
-        LocalDateTime requestTime = LocalDateTime.now();
 
-        log.info("Admin Access Log - User ID: {}, Request Time: {}, Request URL: {}, Method: {}",
-                userId, requestTime, requestUrl, joinPoint.getSignature().getName());
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if(attributes != null) {
+            HttpServletRequest request = attributes.getRequest();
+
+            String userId = String.valueOf(request.getAttribute("userId"));
+            String requestUrl = request.getRequestURI();
+            LocalDateTime requestTime = LocalDateTime.now();
+
+            log.info("Admin Access Log - User ID: {}, Request Time: {}, Request URL: {}, Method: {}",
+                    userId, requestTime, requestUrl, joinPoint.getSignature().getName());
+        }
+        else {
+            log.warn("Request attributes are null");
+        }
     }
 }
