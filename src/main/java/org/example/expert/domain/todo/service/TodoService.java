@@ -17,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -48,10 +50,23 @@ public class TodoService {
         );
     }
 
-    public Page<TodoResponse> getTodos(int page, int size) {
+    public Page<TodoResponse> getTodos(int page, int size, String weather, LocalDateTime startDate, LocalDateTime endDate) {
         Pageable pageable = PageRequest.of(page - 1, size);
+        Page<Todo> todos;
 
-        Page<Todo> todos = todoRepository.findAllByOrderByModifiedAtDesc(pageable);
+        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("startDate is bigger than endDate");
+        }
+
+        if(startDate!=null && endDate!=null){
+            todos = todoRepository.findAllBetweenStartDateAndEndDate(pageable,weather,startDate,endDate);
+        }else if(startDate != null){
+            todos = todoRepository.findAllAfterStartDate(pageable,weather,startDate);
+        } else if (endDate != null) {
+            todos = todoRepository.findAllBeforeEndDate(pageable,weather,endDate);
+        } else {
+            todos = todoRepository.findAllWithWeather(pageable,weather);
+        }
 
         return todos.map(todo -> new TodoResponse(
                 todo.getId(),
