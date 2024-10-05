@@ -13,16 +13,16 @@ public class AuthUser {
 
     private final Long id;
     private final String email;
-    private final String nickName;
+    private final String nickname;
     private final UserRole userRole;
     private final Collection<? extends GrantedAuthority> authorities;
 
-    public AuthUser(Long id, String email, UserRole role, String nickName) {
+    public AuthUser(Long id, String email, UserRole role, String nickname) {
         this.id = id;
         this.email = email;
         this.userRole = role;
         this.authorities = List.of(new SimpleGrantedAuthority(role.name()));
-        this.nickName = nickName;
+        this.nickname = nickname;
         authorities.forEach(System.out::println);
     }
 

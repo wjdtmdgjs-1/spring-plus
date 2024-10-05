@@ -12,8 +12,8 @@ import java.util.Optional;
 
 public interface TodoRepository extends JpaRepository<Todo, Long>, TodoQueryRepository {
 
-    @Query("SELECT t FROM Todo t LEFT JOIN FETCH t.user u ORDER BY t.modifiedAt DESC")
-    Page<Todo> findAllByOrderByModifiedAtDesc(Pageable pageable);
+    /*@Query("SELECT t FROM Todo t LEFT JOIN FETCH t.user u ORDER BY t.modifiedAt DESC")
+    Page<Todo> findAllByOrderByModifiedAtDesc(Pageable pageable);*/
 
   /*  @Query("SELECT t FROM Todo t " +
             "LEFT JOIN t.user " +
@@ -21,17 +21,17 @@ public interface TodoRepository extends JpaRepository<Todo, Long>, TodoQueryRepo
     Optional<Todo> findByIdWithUser(@Param("todoId") Long todoId);*/
 
     @Query("SELECT t FROM Todo t " +
-            "LEFT JOIN FETCH t.user u WHERE t.weather LIKE %:weather% AND t.modifiedAt BETWEEN :startDate AND :endDate ORDER BY t.modifiedAt DESC")
+            "LEFT JOIN FETCH t.user u WHERE (:weather IS NULL OR t.weather=:weather) AND t.modifiedAt BETWEEN :startDate AND :endDate ORDER BY t.modifiedAt DESC")
     Page<Todo> findAllBetweenStartDateAndEndDate(Pageable pageable, String weather, LocalDateTime startDate, LocalDateTime endDate);
 
-    @Query("SELECT t FROM Todo t LEFT JOIN FETCH t.user u WHERE t.weather LIKE %:weather% ORDER BY t.modifiedAt DESC ")
+    @Query("SELECT t FROM Todo t LEFT JOIN FETCH t.user u WHERE (:weather IS NULL OR t.weather=:weather) ORDER BY t.modifiedAt DESC ")
     Page<Todo> findAllWithWeather(Pageable pageable, String weather);
 
     @Query("SELECT t FROM Todo t " +
-            "LEFT JOIN FETCH t.user u WHERE t.weather LIKE %:weather% AND t.modifiedAt >= :startDate ORDER BY t.modifiedAt DESC")
+            "LEFT JOIN FETCH t.user u WHERE (:weather IS NULL OR t.weather=:weather) AND t.modifiedAt >= :startDate ORDER BY t.modifiedAt DESC")
     Page<Todo> findAllAfterStartDate(Pageable pageable, String weather, LocalDateTime startDate);
 
     @Query("SELECT t FROM Todo t " +
-            "LEFT JOIN FETCH t.user u WHERE t.weather LIKE %:weather% AND t.modifiedAt <= :endDate ORDER BY t.modifiedAt DESC")
+            "LEFT JOIN FETCH t.user u WHERE (:weather IS NULL OR t.weather=:weather) AND t.modifiedAt <= :endDate ORDER BY t.modifiedAt DESC")
     Page<Todo> findAllBeforeEndDate(Pageable pageable, String weather, LocalDateTime endDate);
 }
