@@ -57,16 +57,7 @@ public class TodoService {
         if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
             throw new IllegalArgumentException("startDate is bigger than endDate");
         }
-
-        if(startDate!=null && endDate!=null){
-            todos = todoRepository.findAllBetweenStartDateAndEndDate(pageable,weather,startDate,endDate);
-        }else if(startDate != null){
-            todos = todoRepository.findAllAfterStartDate(pageable,weather,startDate);
-        } else if (endDate != null) {
-            todos = todoRepository.findAllBeforeEndDate(pageable,weather,endDate);
-        } else {
-            todos = todoRepository.findAllWithWeather(pageable,weather);
-        }
+        todos = todoRepository.findAllWithCondition(pageable,weather,startDate,endDate);
 
         return todos.map(todo -> new TodoResponse(
                 todo.getId(),

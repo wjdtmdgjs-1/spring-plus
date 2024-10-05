@@ -1,6 +1,5 @@
 package org.example.expert.domain.todo.repository;
 
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Wildcard;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.querydsl.core.types.ExpressionUtils.count;
 import static org.example.expert.domain.comment.entity.QComment.comment;
 import static org.example.expert.domain.manager.entity.QManager.manager;
 import static org.example.expert.domain.todo.entity.QTodo.todo;
@@ -56,7 +54,7 @@ public class TodoQueryRepositoryImpl implements TodoQueryRepository{
                         createAtBetween(startDate, endDate)
                 )
                 .groupBy(todo.id)
-                .orderBy(todo.createdAt.desc()) // 최신 순으로 정렬
+                .orderBy(todo.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -73,11 +71,11 @@ public class TodoQueryRepositoryImpl implements TodoQueryRepository{
     }
 
     private BooleanExpression titleContain(String title){
-        return title !=null ? todo.title.like("%"+ title +"%") : null;
+        return title !=null ? todo.title.contains(title) : null;
     }
 
     private BooleanExpression nicknameContain(String nickname){
-        return nickname != null ? user.nickname.like("%" + nickname + "%") : null;
+        return nickname != null ? user.nickname.contains(nickname) : null;
     }
 
     private BooleanExpression createAtBetween(LocalDateTime startDate, LocalDateTime endDate){

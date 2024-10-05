@@ -5,10 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 public interface TodoRepository extends JpaRepository<Todo, Long>, TodoQueryRepository {
 
@@ -20,18 +18,29 @@ public interface TodoRepository extends JpaRepository<Todo, Long>, TodoQueryRepo
             "WHERE t.id = :todoId")
     Optional<Todo> findByIdWithUser(@Param("todoId") Long todoId);*/
 
-    @Query("SELECT t FROM Todo t " +
-            "LEFT JOIN FETCH t.user u WHERE (:weather IS NULL OR t.weather=:weather) AND t.modifiedAt BETWEEN :startDate AND :endDate ORDER BY t.modifiedAt DESC")
+    /*@Query("SELECT t FROM Todo t " +
+            "LEFT JOIN FETCH t.user u WHERE (:weather IS NULL OR t.weather LIKE %:weather%) " +
+            "AND t.modifiedAt BETWEEN :startDate AND :endDate ORDER BY t.modifiedAt DESC")
     Page<Todo> findAllBetweenStartDateAndEndDate(Pageable pageable, String weather, LocalDateTime startDate, LocalDateTime endDate);
 
-    @Query("SELECT t FROM Todo t LEFT JOIN FETCH t.user u WHERE (:weather IS NULL OR t.weather=:weather) ORDER BY t.modifiedAt DESC ")
+    @Query("SELECT t FROM Todo t LEFT JOIN FETCH t.user u " +
+            "WHERE (:weather IS NULL OR t.weather LIKE %:weather%) ORDER BY t.modifiedAt DESC ")
     Page<Todo> findAllWithWeather(Pageable pageable, String weather);
 
     @Query("SELECT t FROM Todo t " +
-            "LEFT JOIN FETCH t.user u WHERE (:weather IS NULL OR t.weather=:weather) AND t.modifiedAt >= :startDate ORDER BY t.modifiedAt DESC")
+            "LEFT JOIN FETCH t.user u WHERE (:weather IS NULL OR t.weather LIKE %:weather%) " +
+            "AND t.modifiedAt >= :startDate ORDER BY t.modifiedAt DESC")
     Page<Todo> findAllAfterStartDate(Pageable pageable, String weather, LocalDateTime startDate);
 
     @Query("SELECT t FROM Todo t " +
-            "LEFT JOIN FETCH t.user u WHERE (:weather IS NULL OR t.weather=:weather) AND t.modifiedAt <= :endDate ORDER BY t.modifiedAt DESC")
-    Page<Todo> findAllBeforeEndDate(Pageable pageable, String weather, LocalDateTime endDate);
+            "LEFT JOIN FETCH t.user u WHERE (:weather IS NULL OR t.weather LIKE %:weather%) " +
+            "AND t.modifiedAt <= :endDate ORDER BY t.modifiedAt DESC")
+    Page<Todo> findAllBeforeEndDate(Pageable pageable, String weather, LocalDateTime endDate);*/
+
+    @Query("SELECT t FROM Todo t " +
+           "LEFT JOIN FETCH t.user u WHERE (:weather IS NULL OR t.weather LIKE %:weather%) " +
+            "AND (:startDate IS NULL OR t.modifiedAt >= :startDate) " +
+            "AND (:endDate IS NULL OR t.modifiedAt <= :endDate)" +
+            "ORDER BY t.modifiedAt DESC ")
+    Page<Todo> findAllWithCondition(Pageable pageable, String weather, LocalDateTime startDate, LocalDateTime endDate);
 }
