@@ -1,3 +1,4 @@
+/*
 package org.example.expert.aop;
 
 import lombok.RequiredArgsConstructor;
@@ -18,14 +19,16 @@ import java.time.LocalDateTime;
 public class Log {
     private final LogRepository logRepository;
 
-    /*@Transactional
+    */
+/*@Transactional
     @Before("execution(* org.example.expert.domain.manager.controller.ManagerController.saveManager(..))")
     public void logBeforeSaveManager(JoinPoint joinPoint){
         LocalDateTime localDateTime = LocalDateTime.now();
         LogEntity logEntity = new LogEntity(localDateTime);
         logRepository.save(logEntity);
         log.info("Admin Access Log - Method: {}", joinPoint.getSignature().getName());
-    }*/
+    }*//*
+
 
     @Before("execution(* org.example.expert.domain.manager.controller.ManagerController.saveManager(..))")
     public void logBeforeSaveManager(JoinPoint joinPoint) {
@@ -44,3 +47,4 @@ public class Log {
         log.info("Admin Access Log - Method: {}",joinPoint.getSignature().getName());
     }
 }
+*/

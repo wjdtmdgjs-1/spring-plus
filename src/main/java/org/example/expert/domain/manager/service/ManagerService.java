@@ -1,6 +1,8 @@
 package org.example.expert.domain.manager.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.expert.aop.LogEntity;
+import org.example.expert.aop.LogRepository;
 import org.example.expert.domain.common.dto.AuthUser;
 import org.example.expert.domain.common.exception.InvalidRequestException;
 import org.example.expert.domain.manager.dto.request.ManagerSaveRequest;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,13 +32,17 @@ public class ManagerService {
     private final ManagerRepository managerRepository;
     private final UserRepository userRepository;
     private final TodoRepository todoRepository;
+    private final LogService logService;
 
     @Transactional
-    public ManagerSaveResponse saveManager(AuthUser authUser, long todoId, ManagerSaveRequest managerSaveRequest) {
+    public ManagerSaveResponse saveManager(AuthUser authUser, long todoId, ManagerSaveRequest managerSaveRequest){
+        LocalDateTime localDateTime = LocalDateTime.now();
+        logService.saveLog(localDateTime);
         // 일정을 만든 유저
+
         User user = User.fromAuthUser(authUser);
         Todo todo = todoRepository.findById(todoId)
-                .orElseThrow(() -> new InvalidRequestException("Todo not found"));
+                    .orElseThrow(() -> new InvalidRequestException("Todo not found"));
 
         if (todo.getUser() == null || !ObjectUtils.nullSafeEquals(user.getId(), todo.getUser().getId())) {
             throw new InvalidRequestException("담당자를 등록하려고 하는 유저가 유효하지 않거나, 일정을 만든 유저가 아닙니다.");
@@ -50,11 +57,12 @@ public class ManagerService {
 
         Manager newManagerUser = new Manager(managerUser, todo);
         Manager savedManagerUser = managerRepository.save(newManagerUser);
-
         return new ManagerSaveResponse(
                 savedManagerUser.getId(),
                 new UserResponse(managerUser.getId(), managerUser.getEmail())
         );
+
+
     }
 
     public List<ManagerResponse> getManagers(long todoId) {
@@ -94,4 +102,5 @@ public class ManagerService {
 
         managerRepository.delete(manager);
     }
+
 }
