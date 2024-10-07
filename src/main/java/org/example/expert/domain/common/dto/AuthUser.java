@@ -23,7 +23,5 @@ public class AuthUser {
         this.userRole = role;
         this.authorities = List.of(new SimpleGrantedAuthority(role.name()));
         this.nickname = nickname;
-        authorities.forEach(System.out::println);
     }
-
 }
